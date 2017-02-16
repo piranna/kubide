@@ -8,12 +8,14 @@ function noContent(res)
   res.status(204).send()
 }
 
+const textParser = bodyParser.text({type: '*/*'})
+
 
 //
 // Notes
 //
 
-function postNote(req, res, next)
+function postNote(req, res)
 {
   const user = req.user
 
@@ -31,11 +33,18 @@ function getNotes(req, res)
   res.json(req.user.notes || [])
 }
 
-function getNote(req, res)
+function getNote(req, res, next)
 {
-  const note = req.user.notes[req.params.id]
+  const id   = req.params.id
+  const note = req.user.notes[id]
 
-  if(note === undefined) return next(new Error('Unknown id'))
+  if(note === undefined)
+  {
+    const error = new Error('Unknown id "'+id+'"')
+          error.status = 404
+
+    return next(error)
+  }
 
   res.send(note)
 }
@@ -91,20 +100,37 @@ function kubide(db)
   db = db || {}
 
 
+  function postUser(req, res, next)
+  {
+    const body = req.body
+
+    const user = db[body]
+    if(user === undefined) db[body] = {}
+
+    noContent(res)
+  }
+
+
   const router = Router()
 
-  router.param('user', function(req, res, next, user)
+  router.param('user', function(req, res, next, id)
   {
-    user = db[user]
+    const user = db[id]
+    if(user === undefined)
+    {
+      const error = new Error('Unknown user "'+id+'"')
+            error.status = 404
 
-    if(user === undefined) return next(new Error('Unknown user'))
+      return next(error)
+    }
 
     req.user = user
     next()
   })
 
+  router.post('/', textParser, postUser)
   router.route('/:user')
-        .all (bodyParser.text())
+        .all (textParser)
         .post(postNote)
         .get (getNotes)
   router.get  ('/:user/:id', getNote)
