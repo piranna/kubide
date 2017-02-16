@@ -1,0 +1,19 @@
+{
+  "name": "kubide",
+  "version": "0.0.0",
+  "description": "Tu jefe está loco, todos lo sabemos, porque sino, no es lógica la conversación que has tenido esta mañana con él.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/piranna/kubide.git"
+  },
+  "author": "Jesús Leganés-Combarro 'piranna' <piranna@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/piranna/kubide/issues"
+  },
+  "homepage": "https://github.com/piranna/kubide#readme"
+}
