@@ -2,6 +2,7 @@
   "name": "kubide",
   "version": "0.0.0",
   "description": "Tu jefe está loco, todos lo sabemos, porque sino, no es lógica la conversación que has tenido esta mañana con él.",
+  "bin": "server.js",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -15,5 +16,10 @@
   "bugs": {
     "url": "https://github.com/piranna/kubide/issues"
   },
-  "homepage": "https://github.com/piranna/kubide#readme"
+  "homepage": "https://github.com/piranna/kubide#readme",
+  "dependencies": {
+    "body-parser": "^1.16.1",
+    "express": "^4.14.1",
+    "finalhandler": "^1.0.0"
+  }
 }
