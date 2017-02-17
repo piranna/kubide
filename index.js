@@ -1,12 +1,7 @@
+const App          = require('express')
 const bodyParser   = require('body-parser')
 const finalhandler = require('finalhandler')
-const Router       = require('express').Router
 
-
-function noContent(res)
-{
-  res.status(204).send()
-}
 
 const textParser = bodyParser.text({type: '*/*'})
 
@@ -25,7 +20,7 @@ function postNote(req, res)
 
   notes.push(req.body)
 
-  noContent(res)
+  res.sendStatus(204)
 }
 
 function getNotes(req, res)
@@ -35,8 +30,9 @@ function getNotes(req, res)
 
 function getNote(req, res, next)
 {
-  const id   = req.params.id
-  const note = req.user.notes[id]
+  const id    = req.params.id
+  const notes = req.user.notes
+  const note  = notes && notes[id]
 
   if(note === undefined)
   {
@@ -67,11 +63,11 @@ function postFavorite(req, res)
   // Ignore duplicates
   for(let favorite in favorites)
     if(favorite.user === body.user && favorite.id === body.id)
-      return noContent(res)
+      return res.sendStatus(204)
 
   favorites.push(body)
 
-  noContent(res)
+  res.sendStatus(204)
 }
 
 function getFavorites(req, res)
@@ -107,15 +103,16 @@ function kubide(db)
     const user = db[body]
     if(user === undefined) db[body] = {}
 
-    noContent(res)
+    res.sendStatus(204)
   }
 
 
-  const router = Router()
+  const app = App()
 
-  router.param('user', function(req, res, next, id)
+  app.param('user', function(req, res, next, id)
   {
     const user = db[id]
+
     if(user === undefined)
     {
       const error = new Error('Unknown user "'+id+'"')
@@ -128,19 +125,19 @@ function kubide(db)
     next()
   })
 
-  router.post('/', textParser, postUser)
-  router.route('/:user')
-        .all (textParser)
-        .post(postNote)
-        .get (getNotes)
-  router.get  ('/:user/:id', getNote)
-  router.route('/:user/favorites')
-        .all (bodyParser.json())
-        .post(postFavorite)
-        .get (getFavorites)
-  router.use(onerror)
+  app.post('/', textParser, postUser)
+  app.route('/:user')
+     .all (textParser)
+     .post(postNote)
+     .get (getNotes)
+  app.get  ('/:user/:id', getNote)
+  app.route('/:user/favorites')
+     .all (bodyParser.json())
+     .post(postFavorite)
+     .get (getFavorites)
+  app.use(onerror)
 
-  return router
+  return app
 }
 
 
