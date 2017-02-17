@@ -72,8 +72,22 @@ function postFavorite(req, res)
 
 function getFavorites(req, res)
 {
-  // TODO alternatively, allow to return the favorites body
-  res.json(req.user.favorites || [])
+  const db = req._db
+
+  var favorites = req.user.favorites || []
+
+  const fat = req.query.fat
+  if(fat && Boolean(fat))
+    favorites = favorites.map(function(item)
+    {
+      const user = item.user
+      const id   = item.id
+      const body = db[user].notes[id]
+
+      return {user, id, body}
+    })
+
+  res.json(favorites)
 }
 
 
@@ -95,6 +109,12 @@ function kubide(db)
 {
   db = db || {}
 
+
+  function bindDb(req, res, next)
+  {
+    req._db = db
+    next()
+  }
 
   function postUser(req, res, next)
   {
@@ -131,7 +151,7 @@ function kubide(db)
      .get (getNotes)
   app.route('/:user/favorites')
      .post(bodyParser.json(), postFavorite)
-     .get (getFavorites)
+     .get (bindDb, getFavorites)
   app.get  ('/:user/:id', getNote)
   app.use(onerror)
 

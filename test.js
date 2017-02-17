@@ -167,4 +167,80 @@ describe('favorites', function()
         .expect(200, [fav])
     })
   })
+
+  it('Get fat favorites', function()
+  {
+    const user = 'user'
+
+    const favUser = 'userFav'
+    const favNote = 'I love kittens'
+    const noteId  = 0
+
+    const app = kubide()
+
+    return Promise.all(
+    [
+      createUser(app, favUser)
+      .then(function()
+      {
+        return supertest(app)
+          .post('/'+favUser).send(favNote)
+          .expect('Content-Type', /json/)
+          .expect(200, JSON.stringify(noteId))
+      }),
+      createUser(app, user)
+    ])
+    .then(function()
+    {
+      return supertest(app)
+        .post('/'+user+'/favorites').send({user: favUser, id: noteId})
+        .expect(204)
+    })
+    .then(function()
+    {
+      return supertest(app)
+        .get('/'+user+'/favorites')
+        .query({fat: true})
+        .expect(200, [{user: favUser, id: noteId, body: favNote}])
+    })
+  })
+
+  it("Explicit don't want fat favorites", function()
+  {
+    const user = 'user'
+
+    const favUser = 'userFav'
+    const favNote = 'I love kittens'
+    const noteId  = 0
+
+    const fav = {user: favUser, id: noteId}
+
+    const app = kubide()
+
+    return Promise.all(
+    [
+      createUser(app, favUser)
+      .then(function()
+      {
+        return supertest(app)
+          .post('/'+favUser).send(favNote)
+          .expect('Content-Type', /json/)
+          .expect(200, JSON.stringify(noteId))
+      }),
+      createUser(app, user)
+    ])
+    .then(function()
+    {
+      return supertest(app)
+        .post('/'+user+'/favorites').send(fav)
+        .expect(204)
+    })
+    .then(function()
+    {
+      return supertest(app)
+        .get('/'+user+'/favorites')
+        .query({fat: ''})
+        .expect(200, [fav])
+    })
+  })
 })
