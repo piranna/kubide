@@ -20,7 +20,7 @@ function postNote(req, res)
 
   notes.push(req.body)
 
-  res.sendStatus(204)
+  res.json(notes.length-1)
 }
 
 function getNotes(req, res)

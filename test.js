@@ -15,20 +15,6 @@ function createUser(app, user)
 
 describe('notes', function()
 {
-  describe('postNote', function()
-  {
-    // it("User don't have notes", function()
-    // {
-    //   supertest(kubide())
-    //     .post('/user')
-    // })
-    //
-    // it("User have one note", function()
-    // {
-    //
-    // })
-  })
-
   describe('getNotes', function()
   {
     it('Get notes from not existing user', function()
@@ -61,6 +47,7 @@ describe('notes', function()
     {
       const user = 'user'
       const note = 'note'
+      const noteId = 0
 
       const app = kubide()
 
@@ -69,7 +56,8 @@ describe('notes', function()
       {
         return supertest(app)
           .post('/'+user).send(note)
-          .expect(204)
+          .expect('Content-Type', /json/)
+          .expect(200, JSON.stringify(noteId))
       })
       .then(function()
       {
@@ -112,7 +100,8 @@ describe('notes', function()
       {
         return supertest(app)
           .post('/'+user).send(note)
-          .expect(204)
+          .expect('Content-Type', /json/)
+          .expect(200, JSON.stringify(noteId))
       })
       .then(function()
       {
