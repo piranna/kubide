@@ -115,5 +115,56 @@ describe('notes', function()
 
 describe('favorites', function()
 {
+  it('Get favorites from empty user', function()
+  {
+    const user = 'user'
 
+    const app = kubide()
+
+    return createUser(app, user)
+    .then(function()
+    {
+      return supertest(app)
+        .get('/'+user+'/favorites')
+        .expect(200, [])
+    })
+  })
+
+  it('Get favorites', function()
+  {
+    const user = 'user'
+
+    const favUser = 'userFav'
+    const favNote = 'I love kittens'
+    const noteId  = 0
+
+    const fav = {user: favUser, id: noteId}
+
+    const app = kubide()
+
+    return Promise.all(
+    [
+      createUser(app, favUser)
+      .then(function()
+      {
+        return supertest(app)
+          .post('/'+favUser).send(favNote)
+          .expect('Content-Type', /json/)
+          .expect(200, JSON.stringify(noteId))
+      }),
+      createUser(app, user)
+    ])
+    .then(function()
+    {
+      return supertest(app)
+        .post('/'+user+'/favorites').send(fav)
+        .expect(204)
+    })
+    .then(function()
+    {
+      return supertest(app)
+        .get('/'+user+'/favorites')
+        .expect(200, [fav])
+    })
+  })
 })

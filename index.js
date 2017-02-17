@@ -130,11 +130,11 @@ function kubide(db)
      .all (textParser)
      .post(postNote)
      .get (getNotes)
-  app.get  ('/:user/:id', getNote)
   app.route('/:user/favorites')
      .all (bodyParser.json())
      .post(postFavorite)
      .get (getFavorites)
+  app.get  ('/:user/:id', getNote)
   app.use(onerror)
 
   return app
